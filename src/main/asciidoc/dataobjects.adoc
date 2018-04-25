@@ -1,0 +1,24 @@
+= Cheatsheets
+
+[[DocumentApiOptions]]
+== DocumentApiOptions
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
+[[ElasticSearchClientOptions]]
+== ElasticSearchClientOptions
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[hostname]]`hostname`|`String`|-
+|[[port]]`port`|`Number (int)`|-
+|===
+
