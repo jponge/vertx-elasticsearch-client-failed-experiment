@@ -90,13 +90,18 @@ public class DocumentApiOptions {
     return this;
   }
 
+  public DocumentApiOptions refresh(String refresh) {
+    options.put("refresh", refresh);
+    return this;
+  }
+
   public DocumentApiOptions refresh() {
-    options.put("refresh", true);
+    refresh("true");
     return this;
   }
 
   public DocumentApiOptions refreshWaitFor() {
-    options.put("refresh", "wait_for");
+    refresh("wait_for");
     return this;
   }
 

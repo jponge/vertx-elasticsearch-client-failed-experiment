@@ -10,8 +10,8 @@
 ^|Name | Type ^| Description
 |===
 
-[[ElasticSearchClientOptions]]
-== ElasticSearchClientOptions
+[[ElasticsearchClientOptions]]
+== ElasticsearchClientOptions
 
 
 [cols=">25%,^25%,50%"]

@@ -16,12 +16,10 @@
 
 package io.github.jponge.vertx.elasticsearch;
 
-import io.vertx.codegen.annotations.Fluent;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.Json;
+import io.vertx.core.cli.UsageMessageFormatter;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
@@ -34,12 +32,13 @@ import static io.vertx.core.Future.succeededFuture;
 class DocumentApiImpl implements DocumentApi {
 
   private static final DocumentApiOptions EMPTY_OPTIONS = new DocumentApiOptions();
+  private static final String DEFAULT_ELASTICSEARCH_TYPE = "_doc";
 
   private final Vertx vertx;
-  private final ElasticSearchClientOptions options;
+  private final ElasticsearchClientOptions options;
   private final WebClient webClient;
 
-  DocumentApiImpl(Vertx vertx, ElasticSearchClientOptions options) {
+  DocumentApiImpl(Vertx vertx, ElasticsearchClientOptions options) {
     this.vertx = vertx;
     this.options = options;
     webClient = WebClient.create(vertx, new WebClientOptions()
@@ -54,11 +53,47 @@ class DocumentApiImpl implements DocumentApi {
   }
 
   @Override
+  public DocumentApi addOrUpdate(String index, String id, JsonObject document, Handler<AsyncResult<JsonObject>> handler) {
+    return addOrUpdate(index, DEFAULT_ELASTICSEARCH_TYPE, id, EMPTY_OPTIONS, document, handler);
+  }
+
+  @Override
+  public DocumentApi addOrUpdate(String index, String id, DocumentApiOptions options, JsonObject document, Handler<AsyncResult<JsonObject>> handler) {
+    return addOrUpdate(index, DEFAULT_ELASTICSEARCH_TYPE, id, options, document, handler);
+  }
+
+  @Override
+  public DocumentApi add(String index, String type, JsonObject document, Handler<AsyncResult<JsonObject>> handler) {
+    return addOrUpdate(index, type, null, EMPTY_OPTIONS, document, handler);
+  }
+
+  @Override
+  public DocumentApi add(String index, JsonObject document, Handler<AsyncResult<JsonObject>> handler) {
+    return addOrUpdate(index, DEFAULT_ELASTICSEARCH_TYPE, null, EMPTY_OPTIONS, document, handler);
+  }
+
+  @Override
+  public DocumentApi add(String index, String type, DocumentApiOptions options, JsonObject document, Handler<AsyncResult<JsonObject>> handler) {
+    return addOrUpdate(index, type, null, options, document, handler);
+  }
+
+  @Override
+  public DocumentApi add(String index, DocumentApiOptions options, JsonObject document, Handler<AsyncResult<JsonObject>> handler) {
+    return addOrUpdate(index, DEFAULT_ELASTICSEARCH_TYPE, null, options, document, handler);
+  }
+
+  @Override
   public DocumentApi addOrUpdate(String index, String type, String id, DocumentApiOptions options, JsonObject document, Handler<AsyncResult<JsonObject>> handler) {
-    String url = index + "/" + type + "/" + id;
-    HttpRequest<JsonObject> request = webClient
-      .put(url)
-      .as(BodyCodec.jsonObject());
+    HttpRequest<JsonObject> request;
+    if (UsageMessageFormatter.isNullOrEmpty(id)) {
+      request = webClient
+        .post(index + "/" + type)
+        .as(BodyCodec.jsonObject());
+    } else {
+      request = webClient
+        .put(index + "/" + type + "/" + id)
+        .as(BodyCodec.jsonObject());
+    }
     applyOptions(options, request);
     request.sendJsonObject(document, ar -> {
       if (ar.succeeded()) {
@@ -75,19 +110,8 @@ class DocumentApiImpl implements DocumentApi {
   }
 
   @Override
-  public DocumentApi add(String index, String type, JsonObject document, Handler<AsyncResult<JsonObject>> handler) {
-    String url = index + "/" + type;
-    webClient
-      .post(url)
-      .as(BodyCodec.jsonObject())
-      .sendJsonObject(document, ar -> {
-        if (ar.succeeded()) {
-          handler.handle(succeededFuture(ar.result().body()));
-        } else {
-          handler.handle(failedFuture(ar.cause()));
-        }
-      });
-    return this;
+  public DocumentApi exists(String index, String id, Handler<AsyncResult<Boolean>> handler) {
+    return exists(index, DEFAULT_ELASTICSEARCH_TYPE, id, handler);
   }
 
   @Override
@@ -108,6 +132,16 @@ class DocumentApiImpl implements DocumentApi {
   @Override
   public DocumentApi get(String index, String type, String id, Handler<AsyncResult<JsonObject>> handler) {
     return get(index, type, id, EMPTY_OPTIONS, handler);
+  }
+
+  @Override
+  public DocumentApi get(String index, String id, Handler<AsyncResult<JsonObject>> handler) {
+    return get(index, DEFAULT_ELASTICSEARCH_TYPE, id, EMPTY_OPTIONS, handler);
+  }
+
+  @Override
+  public DocumentApi get(String index, String id, DocumentApiOptions options, Handler<AsyncResult<JsonObject>> handler) {
+    return get(index, DEFAULT_ELASTICSEARCH_TYPE, id, options, handler);
   }
 
   @Override

@@ -28,7 +28,7 @@
   <artifactId>vertx-elasticsearch-client</artifactId>
   <version>0-SNAPSHOT</version>
 
-  <name>Vert.x ElasticSearch client</name>
+  <name>Vert.x Elasticsearch client</name>
 
   <properties>
     <stack.version>3.6.0-SNAPSHOT</stack.version>
@@ -36,6 +36,15 @@
     <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
     <junit-platform-surefire-provider.version>1.1.0</junit-platform-surefire-provider.version>
     <junit-platform-launcher.version>1.1.0</junit-platform-launcher.version>
+
+    <!-- Test properties -->
+    <skipTests>false</skipTests>
+    <skipIntegTests>${skipTests}</skipIntegTests>
+    <skipUnitTests>${skipTests}</skipUnitTests>
+
+    <!-- Elasticsearch properties -->
+    <elasticsearch.version>6.2.3</elasticsearch.version>
+    <integ.elasticsearch.image>docker.elastic.co/elasticsearch/elasticsearch</integ.elasticsearch.image>
   </properties>
 
   <dependencyManagement>
@@ -103,6 +112,89 @@
             <version>${junit-jupiter.version}</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>unit-tests</id>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <inherited>true</inherited>
+            <configuration>
+              <skipTests>${skipUnitTests}</skipTests>
+              <includes>
+                <include>**/*Test.class</include>
+              </includes>
+              <excludes>
+                <exclude>**/*$*</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>integration-tests</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <inherited>true</inherited>
+            <configuration>
+              <skipTests>${skipIntegTests}</skipTests>
+              <includes>
+                <include>**/*IT.class</include>
+              </includes>
+              <excludes>
+                <exclude>**/*$*</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.24.0</version>
+        <configuration>
+          <images>
+            <image>
+              <alias>elasticsearch-it</alias>
+              <name>dadoonet/docker-elasticsearch:${project.version}</name>
+              <build>
+                <from>${integ.elasticsearch.image}:${elasticsearch.version}</from>
+              </build>
+              <run>
+                <ports>
+                  <port>integ.elasticsearch.port:9200</port>
+                </ports>
+                <wait>
+                  <http>
+                    <url>http://localhost:9200/</url>
+                    <status>200..499</status>
+                  </http>
+                  <time>60000</time>
+                </wait>
+              </run>
+            </image>
+          </images>
+          <skip>${skipIntegTests}</skip>
+        </configuration>
+        <executions>
+          <execution>
+            <id>start-elasticsearch</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>build</goal>
+              <goal>stop</goal>
+              <goal>start</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop-elasticsearch</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
