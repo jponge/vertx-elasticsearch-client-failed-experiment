@@ -32,4 +32,9 @@ class ElasticsearchHttpClient implements ElasticsearchClient {
   public DocumentApi documentApi() {
     return new DocumentApiImpl(vertx, options);
   }
+
+  @Override
+  public SearchApi searchApi() {
+    return new SearchApiImpl(vertx, options);
+  }
 }

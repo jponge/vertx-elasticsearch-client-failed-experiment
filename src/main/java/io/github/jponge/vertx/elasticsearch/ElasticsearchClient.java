@@ -27,4 +27,6 @@ public interface ElasticsearchClient {
   }
 
   DocumentApi documentApi();
+
+  SearchApi searchApi();
 }

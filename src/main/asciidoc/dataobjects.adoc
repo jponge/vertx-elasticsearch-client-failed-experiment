@@ -22,3 +22,13 @@
 |[[port]]`port`|`Number (int)`|-
 |===
 
+[[SearchApiOptions]]
+== SearchApiOptions
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
