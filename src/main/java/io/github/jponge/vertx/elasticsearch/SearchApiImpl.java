@@ -33,17 +33,10 @@ class SearchApiImpl implements SearchApi {
 
   private static final SearchApiOptions EMPTY_OPTIONS = new SearchApiOptions();
 
-  private final Vertx vertx;
-  private final ElasticsearchClientOptions options;
   private final WebClient webClient;
 
-  SearchApiImpl(Vertx vertx, ElasticsearchClientOptions options) {
-    this.vertx = vertx;
-    this.options = options;
-    webClient = WebClient.create(vertx, new WebClientOptions()
-      .setKeepAlive(true)
-      .setDefaultHost(options.getHostname())
-      .setDefaultPort(options.getPort()));
+  SearchApiImpl(WebClient webClient) {
+    this.webClient = webClient;
   }
 
   @Override

@@ -18,12 +18,10 @@ package io.github.jponge.vertx.elasticsearch;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.cli.UsageMessageFormatter;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
-import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
 
 import static io.vertx.core.Future.failedFuture;
@@ -34,17 +32,10 @@ class DocumentApiImpl implements DocumentApi {
   private static final DocumentApiOptions EMPTY_OPTIONS = new DocumentApiOptions();
   private static final String DEFAULT_ELASTICSEARCH_TYPE = "_doc";
 
-  private final Vertx vertx;
-  private final ElasticsearchClientOptions options;
   private final WebClient webClient;
 
-  DocumentApiImpl(Vertx vertx, ElasticsearchClientOptions options) {
-    this.vertx = vertx;
-    this.options = options;
-    webClient = WebClient.create(vertx, new WebClientOptions()
-      .setKeepAlive(true)
-      .setDefaultHost(options.getHostname())
-      .setDefaultPort(options.getPort()));
+  DocumentApiImpl(WebClient webClient) {
+    this.webClient = webClient;
   }
 
   @Override
