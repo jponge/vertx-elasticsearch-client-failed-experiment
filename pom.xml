@@ -43,7 +43,7 @@
     <skipUnitTests>${skipTests}</skipUnitTests>
 
     <!-- Elasticsearch properties -->
-    <elasticsearch.version>6.2.3</elasticsearch.version>
+    <elasticsearch.version>6.2.4</elasticsearch.version>
     <integ.elasticsearch.image>docker.elastic.co/elasticsearch/elasticsearch</integ.elasticsearch.image>
     <integ.elasticsearch.port>9200</integ.elasticsearch.port>
   </properties>
