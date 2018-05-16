@@ -17,6 +17,7 @@
 package io.github.jponge.vertx.elasticsearch;
 
 import io.github.jponge.vertx.elasticsearch.reactivex.DocumentApi;
+
 import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 
@@ -36,9 +36,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Test the document API")
 @ExtendWith(VertxExtension.class)
-class DocumentApiTest {
+class DocumentApiIT {
 
-  private static final ElasticSearchClientOptions OPTIONS = new ElasticSearchClientOptions()
+  private static final ElasticsearchClientOptions OPTIONS = new ElasticsearchClientOptions()
     .setHostname("localhost")
     .setPort(9200);
 
@@ -47,7 +47,8 @@ class DocumentApiTest {
   class CrudOperations {
 
     private String index;
-    private String type;
+    @Deprecated
+    private String deprecatedType;
     private String id;
 
     private JsonObject document = new JsonObject()
@@ -55,23 +56,50 @@ class DocumentApiTest {
       .put("def", "456")
       .put("ghi", "789");
 
-    private io.github.jponge.vertx.elasticsearch.reactivex.ElasticSearchClient client;
+    private io.github.jponge.vertx.elasticsearch.reactivex.ElasticsearchClient client;
 
     @BeforeEach
     void prepare(Vertx vertx) {
       index = UUID.randomUUID().toString();
-      type = UUID.randomUUID().toString();
+      deprecatedType = UUID.randomUUID().toString();
       id = Integer.toString(Math.abs(new Random().nextInt()));
-      client = io.github.jponge.vertx.elasticsearch.reactivex.ElasticSearchClient.create(vertx, OPTIONS);
+      client = io.github.jponge.vertx.elasticsearch.reactivex.ElasticsearchClient.create(vertx, OPTIONS);
+    }
+
+    @Test
+    @DisplayName("Insert a document with a known ID and deprecated type")
+    void insertDocWithIdAndDeprecatedType(VertxTestContext testContext) {
+      client.documentApi()
+        .rxAddOrUpdate(index, deprecatedType, id, document)
+        .subscribe(response -> {
+          testContext.verify(() -> assertEquals("created", response.getString("result")));
+          testContext.completeNow();
+        }, testContext::failNow);
     }
 
     @Test
     @DisplayName("Insert a document with a known ID")
     void insertDocWithId(VertxTestContext testContext) {
       client.documentApi()
-        .rxAddOrUpdate(index, type, id, document)
+        .rxAddOrUpdate(index, id, document)
         .subscribe(response -> {
           testContext.verify(() -> assertEquals("created", response.getString("result")));
+          testContext.completeNow();
+        }, testContext::failNow);
+    }
+
+    @Test
+    @DisplayName("Check inserting then updating a document at a given ID with deprecated type")
+    void insertDocThenUpdateWithDeprecatedType(VertxTestContext testContext) {
+      DocumentApi documentApi = client.documentApi();
+      documentApi
+        .rxAddOrUpdate(index, deprecatedType, id, document)
+        .flatMap(r1 -> {
+          testContext.verify(() -> assertEquals("created", r1.getString("result")));
+          return documentApi.rxAddOrUpdate(index, deprecatedType, id, document);
+        })
+        .subscribe(r2 -> {
+          testContext.verify(() -> assertEquals("updated", r2.getString("result")));
           testContext.completeNow();
         }, testContext::failNow);
     }
@@ -81,10 +109,10 @@ class DocumentApiTest {
     void insertDocThenUpdate(VertxTestContext testContext) {
       DocumentApi documentApi = client.documentApi();
       documentApi
-        .rxAddOrUpdate(index, type, id, document)
+        .rxAddOrUpdate(index, id, document)
         .flatMap(r1 -> {
           testContext.verify(() -> assertEquals("created", r1.getString("result")));
-          return documentApi.rxAddOrUpdate(index, type, id, document);
+          return documentApi.rxAddOrUpdate(index, id, document);
         })
         .subscribe(r2 -> {
           testContext.verify(() -> assertEquals("updated", r2.getString("result")));
@@ -97,10 +125,10 @@ class DocumentApiTest {
     void insertDocThenUpdateWithVersion(VertxTestContext testContext) {
       DocumentApi documentApi = client.documentApi();
       documentApi
-        .rxAddOrUpdate(index, type, id, document)
+        .rxAddOrUpdate(index, id, document)
         .flatMap(r1 -> {
           testContext.verify(() -> assertEquals("created", r1.getString("result")));
-          return documentApi.rxAddOrUpdate(index, type, id, new DocumentApiOptions().version(1), document);
+          return documentApi.rxAddOrUpdate(index, id, new DocumentApiOptions().version(1), document);
         })
         .subscribe(r2 -> {
           testContext.verify(() -> assertEquals("updated", r2.getString("result")));
@@ -113,10 +141,10 @@ class DocumentApiTest {
     void insertDocThenUpdateWithWrongVersion(VertxTestContext testContext) {
       DocumentApi documentApi = client.documentApi();
       documentApi
-        .rxAddOrUpdate(index, type, id, document)
+        .rxAddOrUpdate(index, id, document)
         .flatMap(r1 -> {
           testContext.verify(() -> assertEquals("created", r1.getString("result")));
-          return documentApi.rxAddOrUpdate(index, type, id, new DocumentApiOptions().version(58), document);
+          return documentApi.rxAddOrUpdate(index, id, new DocumentApiOptions().version(58), document);
         })
         .subscribe(r2 -> {
           testContext.verify(() -> {
@@ -128,11 +156,11 @@ class DocumentApiTest {
     }
 
     @Test
-    @DisplayName("Add a document with automatic ID generation")
-    void addDoc(VertxTestContext testContext) {
+    @DisplayName("Add a document with automatic ID generation and deprecated type")
+    void addDocWithDeprecatedType(VertxTestContext testContext) {
       client
         .documentApi()
-        .rxAdd(index, type, document)
+        .rxAdd(index, deprecatedType, document)
         .subscribe(r -> {
           testContext.verify(() -> {
             assertEquals("created", r.getString("result"));
@@ -143,14 +171,29 @@ class DocumentApiTest {
     }
 
     @Test
-    @DisplayName("Check if a document exists")
-    void checkExists(VertxTestContext testContext) {
+    @DisplayName("Add a document with automatic ID generation")
+    void addDoc(VertxTestContext testContext) {
+      client
+        .documentApi()
+        .rxAdd(index, document)
+        .subscribe(r -> {
+          testContext.verify(() -> {
+            assertEquals("created", r.getString("result"));
+            assertTrue(r.containsKey("_id"));
+          });
+          testContext.completeNow();
+        }, testContext::failNow);
+    }
+
+    @Test
+    @DisplayName("Check if a document exists with deprecated type")
+    void checkExistsWithDeprecatedType(VertxTestContext testContext) {
       DocumentApi documentApi = client
         .documentApi();
 
       Single<Boolean> shouldBeTrue = documentApi
-        .rxAdd(index, type, document)
-        .flatMap(r -> documentApi.rxExists(index, type, r.getString("_id")));
+        .rxAdd(index, deprecatedType, document)
+        .flatMap(r -> documentApi.rxExists(index, deprecatedType, r.getString("_id")));
 
       Single<Boolean> shouldBeFalse = documentApi
         .rxExists("abcdefghijklmnop", "1234567890", "1-2-3-4");
@@ -164,13 +207,51 @@ class DocumentApiTest {
     }
 
     @Test
+    @DisplayName("Check if a document exists")
+    void checkExists(VertxTestContext testContext) {
+      DocumentApi documentApi = client
+        .documentApi();
+
+      Single<Boolean> shouldBeTrue = documentApi
+        .rxAdd(index, document)
+        .flatMap(r -> documentApi.rxExists(index, r.getString("_id")));
+
+      Single<Boolean> shouldBeFalse = documentApi
+        .rxExists("abcdefghijklmnop", "1234567890", "1-2-3-4");
+
+      Single
+        .zip(shouldBeTrue, shouldBeFalse, (b1, b2) -> new boolean[]{b1, b2})
+        .subscribe(booleans -> {
+          testContext.verify(() -> assertArrayEquals(new boolean[]{true, false}, booleans));
+          testContext.completeNow();
+        }, testContext::failNow);
+    }
+
+    @Test
+    @DisplayName("Get a document with deprecated type")
+    void getDocWithDeprecatedType(VertxTestContext testContext) {
+      DocumentApi documentApi = client
+        .documentApi();
+      documentApi
+        .rxAdd(index, deprecatedType, document)
+        .flatMap(r -> documentApi.rxGet(index, deprecatedType, r.getString("_id")))
+        .subscribe(r -> {
+          testContext.verify(() -> {
+            assertEquals(true, r.getBoolean("found"));
+            assertTrue(r.containsKey("_source"));
+          });
+          testContext.completeNow();
+        }, testContext::failNow);
+    }
+
+    @Test
     @DisplayName("Get a document")
     void getDoc(VertxTestContext testContext) {
       DocumentApi documentApi = client
         .documentApi();
       documentApi
-        .rxAdd(index, type, document)
-        .flatMap(r -> documentApi.rxGet(index, type, r.getString("_id")))
+        .rxAdd(index, document)
+        .flatMap(r -> documentApi.rxGet(index, r.getString("_id")))
         .subscribe(r -> {
           testContext.verify(() -> {
             assertEquals(true, r.getBoolean("found"));

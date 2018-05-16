@@ -21,21 +21,20 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @DataObject(generateConverter = true)
-public class DocumentApiOptions {
+public class SearchApiOptions {
 
   private Map<String, Object> options = new HashMap<>();
 
-  public DocumentApiOptions() {
+  public SearchApiOptions() {
   }
 
-  public DocumentApiOptions(DocumentApiOptions other) {
+  public SearchApiOptions(SearchApiOptions other) {
     this.options = new HashMap<>(other.options);
   }
 
-  public DocumentApiOptions(JsonObject jsonObject) {
+  public SearchApiOptions(JsonObject jsonObject) {
     this.options = new HashMap<>(jsonObject.getMap());
   }
 
@@ -47,42 +46,17 @@ public class DocumentApiOptions {
     this.options = options;
   }
 
-  public DocumentApiOptions version(long version) {
-    options.put("version", version);
-    return this;
-  }
-
-  public DocumentApiOptions versionMatches() {
-    options.put("version_type", "internal");
-    return this;
-  }
-
-  public DocumentApiOptions versionStrictlyHigher() {
-    options.put("version_type", "external_gt");
-    return this;
-  }
-
-  public DocumentApiOptions versionHigher() {
-    options.put("version_type", "external_gte");
-    return this;
-  }
-
-  public DocumentApiOptions opType(String type) {
-    options.put("op_type", type);
-    return this;
-  }
-
-  public DocumentApiOptions routing(String routing) {
+  public SearchApiOptions routing(String routing) {
     options.put("routing", routing);
     return this;
   }
 
-  public DocumentApiOptions waitForAllActiveShards() {
+  public SearchApiOptions waitForAllActiveShards() {
     options.put("wait_for_active_shards", "all");
     return this;
   }
 
-  public DocumentApiOptions waitForActiveShards(int n) {
+  public SearchApiOptions waitForActiveShards(int n) {
     if (n <= 0) {
       throw new IllegalArgumentException("The number of active shards to wait for must be > 0");
     }
@@ -90,28 +64,8 @@ public class DocumentApiOptions {
     return this;
   }
 
-  public DocumentApiOptions refresh(String refresh) {
-    options.put("refresh", refresh);
-    return this;
-  }
-
-  public DocumentApiOptions refresh() {
-    refresh("true");
-    return this;
-  }
-
-  public DocumentApiOptions refreshWaitFor() {
-    refresh("wait_for");
-    return this;
-  }
-
-  public DocumentApiOptions timeout(String spec) {
+  public SearchApiOptions timeout(String spec) {
     options.put("timeout", spec);
-    return this;
-  }
-
-  public DocumentApiOptions realtime(boolean value) {
-    options.put("realtime", value);
     return this;
   }
 }

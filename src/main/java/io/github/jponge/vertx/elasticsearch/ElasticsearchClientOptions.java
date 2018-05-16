@@ -20,7 +20,7 @@ import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 @DataObject(generateConverter = true)
-public class ElasticSearchClientOptions {
+public class ElasticsearchClientOptions {
 
   public static final String HOSTNAME = "hostname";
   public static final String PORT = "port";
@@ -28,15 +28,15 @@ public class ElasticSearchClientOptions {
   private String hostname = "localhost";
   private int port = 9200;
 
-  public ElasticSearchClientOptions() {
+  public ElasticsearchClientOptions() {
   }
 
-  public ElasticSearchClientOptions(ElasticSearchClientOptions other) {
+  public ElasticsearchClientOptions(ElasticsearchClientOptions other) {
     this.hostname = other.hostname;
     this.port = other.port;
   }
 
-  public ElasticSearchClientOptions(JsonObject jsonObject) {
+  public ElasticsearchClientOptions(JsonObject jsonObject) {
     this.hostname = jsonObject.getString(HOSTNAME);
     this.port = jsonObject.getInteger(PORT);
   }
@@ -45,7 +45,7 @@ public class ElasticSearchClientOptions {
     return hostname;
   }
 
-  public ElasticSearchClientOptions setHostname(String hostname) {
+  public ElasticsearchClientOptions setHostname(String hostname) {
     this.hostname = hostname;
     return this;
   }
@@ -54,7 +54,7 @@ public class ElasticSearchClientOptions {
     return port;
   }
 
-  public ElasticSearchClientOptions setPort(int port) {
+  public ElasticsearchClientOptions setPort(int port) {
     this.port = port;
     return this;
   }

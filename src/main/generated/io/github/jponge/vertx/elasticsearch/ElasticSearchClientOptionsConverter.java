@@ -20,13 +20,13 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
 /**
- * Converter for {@link io.github.jponge.vertx.elasticsearch.ElasticSearchClientOptions}.
+ * Converter for {@link io.github.jponge.vertx.elasticsearch.ElasticsearchClientOptions}.
  *
- * NOTE: This class has been automatically generated from the {@link io.github.jponge.vertx.elasticsearch.ElasticSearchClientOptions} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link io.github.jponge.vertx.elasticsearch.ElasticsearchClientOptions} original class using Vert.x codegen.
  */
-public class ElasticSearchClientOptionsConverter {
+public class ElasticsearchClientOptionsConverter {
 
-  public static void fromJson(JsonObject json, ElasticSearchClientOptions obj) {
+  public static void fromJson(JsonObject json, ElasticsearchClientOptions obj) {
     if (json.getValue("hostname") instanceof String) {
       obj.setHostname((String)json.getValue("hostname"));
     }
@@ -35,7 +35,7 @@ public class ElasticSearchClientOptionsConverter {
     }
   }
 
-  public static void toJson(ElasticSearchClientOptions obj, JsonObject json) {
+  public static void toJson(ElasticsearchClientOptions obj, JsonObject json) {
     if (obj.getHostname() != null) {
       json.put("hostname", obj.getHostname());
     }

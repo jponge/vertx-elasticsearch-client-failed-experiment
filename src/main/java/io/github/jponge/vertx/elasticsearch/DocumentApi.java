@@ -26,20 +26,61 @@ import io.vertx.core.json.JsonObject;
 public interface DocumentApi {
 
   @Fluent
+  @Deprecated
   DocumentApi addOrUpdate(String index, String type, String id, JsonObject document, Handler<AsyncResult<JsonObject>> handler);
 
+  @Fluent
+  DocumentApi addOrUpdate(String index, String id, JsonObject document, Handler<AsyncResult<JsonObject>> handler);
+
+  /**
+   * Add or update a document in elasticsearch
+   * @param index     Index name
+   * @param type      Type (types are deprecated in elasticsearch). Use "_doc".
+   * @param id        Document ID if set. Can be null in which case elasticsearch will generate an id.
+   * @param options   Options
+   * @param document  Json document to index
+   * @param handler   Response handler
+   * @return this
+   * @see @{{@link #addOrUpdate(String, String, JsonObject, Handler)} if you are using default type
+   */
   @Fluent
   DocumentApi addOrUpdate(String index, String type, String id, DocumentApiOptions options, JsonObject document, Handler<AsyncResult<JsonObject>> handler);
 
   @Fluent
+  DocumentApi addOrUpdate(String index, String id, DocumentApiOptions options, JsonObject document, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  @Deprecated
   DocumentApi add(String index, String type, JsonObject document, Handler<AsyncResult<JsonObject>> handler);
 
   @Fluent
+  DocumentApi add(String index, JsonObject document, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  @Deprecated
+  DocumentApi add(String index, String type, DocumentApiOptions options, JsonObject document, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  DocumentApi add(String index, DocumentApiOptions options, JsonObject document, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  @Deprecated
   DocumentApi exists(String index, String type, String id, Handler<AsyncResult<Boolean>> handler);
 
   @Fluent
+  DocumentApi exists(String index, String id, Handler<AsyncResult<Boolean>> handler);
+
+  @Fluent
+  @Deprecated
   DocumentApi get(String index, String type, String id, Handler<AsyncResult<JsonObject>> handler);
 
   @Fluent
+  DocumentApi get(String index, String id, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  @Deprecated
   DocumentApi get(String index, String type, String id, DocumentApiOptions options, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  DocumentApi get(String index, String id, DocumentApiOptions options, Handler<AsyncResult<JsonObject>> handler);
 }

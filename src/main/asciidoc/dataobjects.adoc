@@ -10,8 +10,8 @@
 ^|Name | Type ^| Description
 |===
 
-[[ElasticSearchClientOptions]]
-== ElasticSearchClientOptions
+[[ElasticsearchClientOptions]]
+== ElasticsearchClientOptions
 
 
 [cols=">25%,^25%,50%"]
@@ -20,5 +20,15 @@
 ^|Name | Type ^| Description
 |[[hostname]]`hostname`|`String`|-
 |[[port]]`port`|`Number (int)`|-
+|===
+
+[[SearchApiOptions]]
+== SearchApiOptions
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
 |===
 

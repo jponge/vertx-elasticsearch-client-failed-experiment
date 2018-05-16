@@ -16,23 +16,17 @@
 
 package io.github.jponge.vertx.elasticsearch;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 
-class ElasticSearchHttpClient implements ElasticSearchClient {
+@VertxGen
+public interface ElasticsearchClient {
 
-  private final Vertx vertx;
-  private final ElasticSearchClientOptions options;
-
-  ElasticSearchHttpClient(Vertx vertx, ElasticSearchClientOptions options) {
-    this.vertx = vertx;
-    this.options = options;
+  static ElasticsearchClient create(Vertx vertx, ElasticsearchClientOptions options) {
+    return new ElasticsearchHttpClient(vertx, options);
   }
 
-  @Override
-  public DocumentApi documentApi() {
-    return new DocumentApiImpl(vertx, options);
-  }
+  DocumentApi documentApi();
+
+  SearchApi searchApi();
 }
