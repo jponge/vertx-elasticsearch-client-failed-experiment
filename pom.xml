@@ -45,6 +45,7 @@
     <!-- Elasticsearch properties -->
     <elasticsearch.version>6.2.3</elasticsearch.version>
     <integ.elasticsearch.image>docker.elastic.co/elasticsearch/elasticsearch</integ.elasticsearch.image>
+    <integ.elasticsearch.port>9200</integ.elasticsearch.port>
   </properties>
 
   <dependencyManagement>
@@ -167,7 +168,7 @@
                 </ports>
                 <wait>
                   <http>
-                    <url>http://localhost:9200/</url>
+                    <url>http://localhost:${integ.elasticsearch.port}/</url>
                     <status>200..499</status>
                   </http>
                   <time>60000</time>
